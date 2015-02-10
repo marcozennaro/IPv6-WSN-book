@@ -1,0 +1,214 @@
+== IoT Simulation (Cooja)
+
+
+Cooja is the Contiki network simulator. Cooja allows large and small networks of Contiki motes to be simulated. Motes can be emulated at the hardware level, which is slower but allows precise inspection of the system behavior, or at a less detailed level, which is faster and allows simulation of larger networks. Cooja is a highly useful tool for Contiki development as it allows developers to test their code and systems long before running it on the target hardware. Developers regularly set up new simulations both to debug their software and to verify the behavior of their systems.
+
+To start Cooja,  in the terminal window go to the Cooja directory:
+
+[source]
+cd contiki/tools/cooja
+
+Start Cooja with the command:
+
+[source]
+ant run
+
+When Cooja is compiled, it will start with a blue empty window. Now that Cooja is up and running, we can try it out with an example simulation.
+Create new simulation
+Click the File menu and click New simulation. Cooja now opens up the Create new simulation dialog. In this dialog, we may choose to give our simulation a new name, but for this example, we'll just stick with My simulation. Leave the other options set as default. Click the Create button.
+Cooja brings up the new simulation. You can choose what you want to visualize by using the Tools menu. The Network window shows all the motes in the simulated network - it is empty now, since we have no motes in our simulation. The Timeline window shows all communication events in the simulation over time - very handy for understanding what goes on in the network. The Mote output window  shows all serial port printouts from all the motes. The Notes window is where we can put notes for our simulation. And the Simulation control window is where we start, pause, and reload our simulation.
+Add motes
+Before we can simulate our network, we must add one or more motes. We do this via the Motes menu, where we click on Add motes. Since this is the first mote we add, we must first create a mote type to add. Click Create new mote type. and select one of the available mote types. For this example, we click Z1 mote. to create an emulated Z1 mote type. Cooja opens the Create Mote Type dialog, in which we can choose a name for our mote type as well as the Contiki application that our mote type will run. For this example, we stick with the suggested name, and instead click on the Browse. button on the right hand side to choose our Contiki application.
+
+Revisiting broadcast-example in Cooja
+
+Setting up large networks on physical nodes can pose a challenge in terms of instrumenting properly to measure all network elements and having enough equipment available, that’s where cooja comes handy.
+
+Create a new simulation and define a new Z1 mote-based type of mote called Broadcast, do so by clicking on Motes, Add Motes, Create new mote type and select the Z1 mote.  Use the example at examples/ipv6/simple-udp-rpl/broadcast-example.c
+
+
+
+
+
+Press Compile and wait for the compilation to end, if there are no errors press Create and it will take you to the next screen.  Now add 10 motes using Random positioning.  Next in the Network Panel, click on View and add the following: Radio Environment, Mote ID and addresses.  Now if you click on a Mote, it will display the Effective Radio coverage (green zone) and interference zone (grey zone) according to the selected medium model.
+
+Be sure to also have the Network, Mote Output and Radio Messages panels in your layout, available at the Tools menu.
+
+
+
+
+You now should be able to see the network traffic, the messages and the Motes console output,  You can pause and start again the simulation to inspect the generated information at your own pace.
+
+HOW CAN I LINK THE SECTION BEFORE TO THIS NEW SECTION?
+
+Routing Protocol for Low Power Networks (RPL)
+
+RPL is IPv6 routing protocol for low power and lossy networks designed by IETF routing over low power and lossy network (ROLL) group [X], used as the defacto routing protocol in Contiki.  RPL is a proactive distance vector protocol, it starts finding the routes as soon as the RPL network is initialized.
+
+
+
+Image source: http://www.slideshare.net/asobimat/rpl-dodag
+
+It supports three traffic patterns: MP2P, point-to-multipoint (P2MP) and point-to-point (P2P).
+
+RPL builds a Destination Oriented DAGs (DODAGs) rooted towards one sink (DAG ROOT) identified by a unique identifier DODAGID.  The DODAGs are optimized using a Objective Function (OF) metric identified by an Objective Code Point (OCP), which indicates the dynamic constraints and the metrics such as hop count, latency, expected transmission count, parents selection, energy, etc.  A rank number is assigned to each node which can be used to determine its relative position and distance to the root in the DODAG.
+
+Within a given network, there may be multiple, logically independent RPL instances.  A RPL node may belong to multiple RPL instances, and may act as a router in some and as a leaf in others.  A set of multiple DODAGs can be in a RPL INSTANCE and a node can be a member of multiple RPL INSTANCEs, but can belong to at most one DODAG per DAG INSTANCE.
+
+A trickle timer mechanism [X] regulates DODAG Information Object (DIO) message transmissions, which are used to build and maintain upwards routes of the DODAG, advertising its RPL instance, DODAG ID, RANK and DODAG version number.
+
+A node can request DODAG information by sending DODAG Information Solicitation messages (DIS), soliciting DIO messages from its neighborhoods to update its routing information and join an instance.
+
+Nodes have to monitor DIO messages before joining a DODAG, and then join a DODAG by selecting a parent Node from its neighbors using its advertised latency, OF and RANK.  Destination Advertisement Object (DAO) messages are used to maintain downward routes by selecting the preferred parent with lower rank and sending a packet to the DAG ROOT through each of the intermediate Nodes.
+
+PLACE IMAGE SHOWING RPL MESSAGES HERE !!!
+
+RPL has two mechanisms to repair the topology of the DODAG, one to to avoid looping and allow nodes to join/rejoin, and other called global repair [X]. Global repair is initiated at the DODAG ROOT by incrementing the DODAG Version Number to create a new DODAG Version.
+
+
+
+Tip: Go to core/net/rpl and navigate through the C files, look for DEBUG defines and change its value to DEBUG_PRINT, this will print out to screen useful information allowing to better understand the RPL mechanics.
+
+
+Connecting our network to the world
+
+We now want to go entirely IPv6, so that our nodes can be reached by the Internet!
+
+We expect your machine to have an IPv6 address, either via the existing cabled network or via a tunnel (such as Gogo6 or Hurricane Electric or others).
+
+In the past examples we have deployed and analyzed link-local networks only, now we will take a step further and connect our networks to external ones, allowing them to be reachable from outside and communicate globally to other networks using 6loWPAN and IPv6.
+
+
+
+
+
+
+The border router
+
+
+The border router or edge router is typically a device sitting at the edge of our network which allow us to talk to outside networks, using its built-in network interfaces, such as WiFI, Ethernet, Serial, etc.  In Contiki the current and most used border router application implements a serial-based interface called SLIP, it allows to connect a given mote to a host using scripts like tunslip6 (tools/tunslip6) over the serial port, creating a tunneled network interface, which can be given an IPv6 prefix to set the network global IPv6 addresses.
+
+The most used border router application in Contiki is located at examples/ipv6/rpl-border-router.  Motes running the border router application will typically send over the serial port a character sequence, to synchronize with the host over the tunslip6 script.  Normally is preferable to configure the border router as a non-sleeping device, so the radio receiver is always on.  You can configure the border router settings using the project-conf.h file.
+
+#undef NETSTACK_CONF_RDC
+#define NETSTACK_CONF_RDC 	nullrdc_driver
+By default the border-router applications includes a built-in web server, displaying information about the network, such as the immediate neighbors (1-hop located) and the known routes to nodes in its network.  To enable the web server, the WITH_WEBSERVER  flag should be enabled, and by default it will add the httpd-simple.c application.
+
+To compile and upload the border router to the Mote just type:
+make TARGET=z1 border-router.upload
+
+And to connect the border router to your host run:
+make make TARGET=z1 connect-router
+
+By default it will try to connect to a mote at port /dev/ttyUSB0 using the following serial settings:  115200 baudrate 8N1.  If you do not specify an IPv6 prefix it will use the default aaaa::1/64, to specify a specific one run the tunslip tool instead using the following:
+
+make make TARGET=z1 connect-router PREFIX=2001:abcd:dead:beef::1/64
+
+You can also compile and run the tunslip6 tool directly from the tools location, to compile just type:
+
+cc tunslip6.c -o tunslip6
+
+And to run with specific arguments, if you are required to use a Z1 mote connected to a specific serial port, or require to name your tunnel connection with a specific naming, or proxify to a given address and port.  Run ./tunslip -H for more information.
+
+./tunslip -s /dev/ttyUSB0 -t tun0 2001:abcd:dead:beef::1/64
+
+
+The next example is going to be executed using Cooja, the main objective behind is to deploy a multi-hop network, reachable world-wide using IPv6, effectively connecting our simulation to real-word devices.
+
+Open Cooja and load the file at examples/z1/ipv6/z1-websense/example-z1-websense.csc.
+
+
+
+The first noticeable thing about the example is the topology at the Network panel, the Node 6 corresponds to the Border Router Mote, which has only 1 neighbor in its wireless coverage area, and downwards we can see the Border Router being 4-hops apart from the Mote 5.  The example contain a step-by-step guide in the Notes panel for you to also follow.
+
+Motes 1 to 5 have been programed with an example called z1-websense, which is a small built-in webserver displaying a history chart with the battery and temperature readings of the Mote, accessible from our web browsers.
+
+Now enable the Border Router (from now on BR) to connect over the serial socket to our host, right-click the BR and select the Serial Socket (SERVER) option from the “More tools” panel.  This will allow us to connect to the simulated BR via the tunslip6 script, run the tool by typing:
+
+sudo ./tunslip6 -a 127.0.0.1 -p 60001 aaaa::1/64
+
+Or from the examples/ipv6/rpl-border-router location you can run instead:
+
+  make connect-router-cooja
+
+You can replace the IPv6 prefix with your own, the output is shown below.  The connection status is shown in the Serial Socket panel in your Cooja layout, it should have changed from listening to Connected.
+
+
+
+Notice the tunnel connection has been created but no prefix has been given yet.  At the Simulation control panel click Start, we should see the BR receiving the aaaa:: prefix by default,
+thus creating the global server IPv6 address, and it will start sending DIO messages to advertise
+itself, the Nodes 1-5 will send multicast DIS to request DAG information.
+
+Finally Node 1 (in range of BR) will receive the BR DIO, add BR as preferred parent, joining the newly found instance, replying to BR with a DAO to advertise itself to the BR.  Node 1 will multicast DIO messages, Node 2 will receive it, join the instance through Node 1, and reply with a DAO message, which will be used by Node 1 to add Node 2 to its routing table, then forward it upstream to BR.
+
+
+You can pause the simulation and examine the packets and console output at your own pace, simply click the Pause button at the Simulation Control panel.  When you are done click Restart.  To check we have connectivity from our host to the simulated Motes, open a terminal console and try to ping the devices like follows:
+
+  ping6 aaaa::c30c:0:0:5
+
+Replace the prefix with your own.
+
+
+
+
+
+Now open a web browser (Firefox in our example) and type in the URL panel the BR IPv6 public address as follows:
+
+  http://[aaaa::c30c:0:0:6]
+
+It will display the BR built-in webserver, showing the immediate neighbors and the known routes to the Motes in its instance.  We can notice the next-hop neighbor to reach Motes 2 to 5 is Mote 1 as expected.
+
+
+
+
+
+
+Now to access the webserver running on the nodes, type the global address of any of the Motes in the network.  The battery and temperature reading diplayed are emulated values.
+
+
+
+
+You can examine the packets being sent and received by going through the Radio Messages panel, click on the Analyzer menu and select the 6LoWPAN analyzer with PCAP to format the messages with PCAP to open later using wireshark, click on the File menu and Save To File.
+
+
+
+Exercise: connect your simulation
+
+Setting up IPv6 using gogo6.
+
+In networking, a tunnelling protocol enables new networking functions while still preserving the underlying network as it is. IPv6 tunneling enables IPv6 hosts and routers to connect with other IPv6 hosts and routers over the existing IPv4 Internet. The main purpose of IPv6 tunneling is to deploy IPv6 as well as maintain compatibility with the existing base of IPv4 hosts and routers. IPv6 tunneling encapsulates IPv6 datagrams within IPv4 packets. The encapsulated packets travel across an IPv4 Internet until they reach their destination host or router. The IPv6-aware host or router decapsulates the IPv6 datagrams, forwarding them as needed.
+
+
+
+
+Several tunnel brokers have been developed along with a Tunnel Setup Protocol (TSP). TSP allows IPv4 or IPv6 packets to be encapsulated and carried over IPv4, IPv6 or IPv4 NATs. TSP sets up the tunnel parameters between a user and a server. It handles authentication, encapsulation, IP address assignment and DNS functionality.
+
+One of these TSP providers is gogo6, which provides the gogoCLIENT. The gogoCLIENT connected to the Freenet6 service provides IPv6 connectivity so you can test your v6 network, service or app.
+
+To use the free gogo6 service, setup an account at
+
+http://www.gogo6.com/profile/gogoCLIENT
+
+To set up the client on Ubuntu:  first install the client with
+
+sudo apt-get install gogoc
+
+Modify the config file from /etc/gogoc/gogoc.conf with
+
+sudo nano -w /etc/gogoc/gogoc.conf.
+
+Locate and modify the following lines:
+
+userid= your_freenet6_id
+passwd= your_password
+server= broker.freenet6.net
+
+Start the gogo client with sudo /etc/init.d/gogoc start and you are ready to go.
+
+Try a ping to ipv6.google.com with
+
+ping6 ipv6.google.com
+
+If you can ping google via IPv6, you are ready to go!
+
+You can use http://lg.as6453.net/bin/lg.cgi to check if your machine is visible from the Internet
