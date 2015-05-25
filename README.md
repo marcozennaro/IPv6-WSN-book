@@ -1,9 +1,34 @@
-# IPv6-WSN-book
+# IoT in 5 days: an easy guide to Wireless Sensor Networks (WSN), IPv6 and the Internet of Things (IoT)
 
-Booklet on Internet of Things prepared for the Workshop on Scientific Applications for the Internet of Things (IoT) to be held at ICTP, Trieste, Italy, from 16 to 27 March 2015.
+This booklet is a quick but thoughtful guide to jump into the Internet of Things, covering important subjects as IPv6 networking, sensors, wireless protocols and technologies, as well as IoT cloud platforms and its most commonly used protocols, featuring lots of _hands-on_ examples to start working from day one.
 
-Topics covered:
+The lessons and examples are heavily focused on Contiki OS, a well known IoT operative system well suited for low power embedded devices, and the Zolertia Z1 mote, a widely used hardware platform to develop a wide range of IoT applications.  The Raspberry Pi is used as well.
 
-- Intro to IoT
-- Intro to IPv6
-- Contiki operating system
+
+## Topics covered:
+
+- Introduction to IoT.
+- Introduction to IPv6.
+- Contiki OS introduction.
+- Analogue and digital sensors.
+- Wireless basics.
+- UDP and TCP over multi-hop mesh networks.
+- MQTT, CoAP and RESTFull protocols.
+- Network Simulation using Cooja.
+- End-to-end IPv6 applications: connecting to IoT cloud platforms
+
+
+## Releases
+
+A first draft of this book was showcased, and heavily used, in the Workshop on Scientific Applications for the Internet of Things (IoT), hosted at the Abdus Salam International Centre of Theoretical Physics (ICTP), in Trieste, Italy, from 16 to 27 March 2015.
+
+The Workshop website has plenty of available material and lectures, it can be browsed at:
+
+<http://wireless.ictp.it/school_2015/>
+
+
+## Source code
+
+The code examples used in the IoT workshop is located at:
+
+<https://github.com/alignan/contiki/tree/ictp_2015>
