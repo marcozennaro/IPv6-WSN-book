@@ -2,7 +2,7 @@
 
 This booklet is a quick but thoughtful guide to jump into the Internet of Things, covering important subjects as IPv6 networking, sensors, wireless protocols and technologies, as well as IoT cloud platforms and its most commonly used protocols, featuring lots of _hands-on_ examples to start working from day one.
 
-The lessons and examples are heavily focused on Contiki OS, a well known IoT operative system well suited for low power embedded devices, and the Zolertia Z1 mote, a widely used hardware platform to develop a wide range of IoT applications.  The Raspberry Pi is used as well.
+The lessons and examples are heavily focused on Contiki OS, a well known IoT operating system well suited for low power embedded devices, and the Zolertia Z1 mote, a widely used hardware platform to develop a wide range of IoT applications.  The Raspberry Pi is used as well.
 
 ## Topics covered:
 
